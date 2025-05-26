@@ -44,10 +44,13 @@
 \renewcommand{\thefootnote}{\fnsymbol{footnote}}
 \newcommand{\noin}{\noindent}    
 \newcommand{\logit}{\textrm{logit}} 
-\newcommand{\var}{\textrm{Var}}
-\newcommand{\cov}{\textrm{Cov}} 
-\newcommand{\corr}{\textrm{Corr}} 
+\newcommand{\var}{\mathrm{Var}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Cov}{\mathrm{Cov}} 
+\newcommand{\corr}{\textrm{Corr}}
+\newcommand{\Corr}{\mathrm{Corr}}
 \renewcommand{\N}{\mathcal{N}}
+\renewcommand{\E}{\mathrm{E}}
 \newcommand{\Bern}{\textrm{Bern}}
 \newcommand{\Bin}{\textrm{Bin}}
 \newcommand{\Beta}{\textrm{Beta}}
@@ -99,9 +102,12 @@
     \item if \( a \) is constant vector then: \( \var(a^T \vect{X})=a^T\Sigma\,a \)
     \item if \( \vect{X} \independent \vect{Y} \) then \( \var(\vect{X}+\vect{Y})=\var(\vect{X})+\var(\vect{Y}) \)
   \end{itemize}
-  \textit{Correlation coefficient:}
-  \[\corr(X_i,X_j)=\frac{\cov(X_i,X_j)}{\sqrt{\var(X_i)\var(X_j)}}\]
-
+  \textit{Covariance:}
+  \begin{align*}
+    \var(\vect{X})                   & = \mathrm{diag}(\Sigma) = \mathrm{E}[(\vect{X}-\vect{\mu})(\vect{X}-\vect{\mu})^T]                                                                                                               \\
+    \mathrm{Cov}(\vect{X},\vect{Y})  & = \mathrm{E}[(\vect{X}-\vect{\mu})(\vect{Y}-\vect{\nu})^T] = \mathrm{E}[\vect{X}\vect{Y}^T] - \mathrm{E}[\vect{X}]\mathrm{E}[\vect{Y}] = \mathrm{E}[\vect{X}\vect{Y}^T] - \vect{\mu}\vect{\nu}^T \\
+    \mathrm{Corr}(\vect{X},\vect{Y}) & = \frac{\mathrm{Cov}(\vect{X},\vect{Y})}{\sqrt{\mathrm{Var}(\vect{X})\mathrm{Var}(\vect{Y})}} = \frac{\Cov(X_i,X_j)}{\sqrt{\var(X_i)\var(X_j)}}
+  \end{align*}
   \section{Multivariate Normal (MVN):}
   \( \vect{X}\sim N_p(\vect{\mu},\Sigma) \) means \( \vect{X} \) has density
   \[f_X(\mathbf{\vect{x}}) = \frac{1}{(2\pi)^{p/2}|\Sigma|^{1/2}}\exp\{-\frac{1}{2}(\vect{x}-\vect{\mu})^T\Sigma^{-1}(\vect{x}-\vect{\mu})\}\,.\]
@@ -120,6 +126,7 @@
   Components of \( \vect{X} \) are independent \( \iff \) \( \Sigma \) is diagonal (for MVN, uncorrelated \( \Rightarrow \) independent).\\[0em]
   \textbf{Mahalanobis:} If \( \vect{X}\sim N_p(\vect{\mu},\Sigma) \), then
   \[ (\vect{X}-\vect{\mu})^T\Sigma^{-1}(\vect{X}-\vect{\mu}) \sim \chi^2_p \quad \text{and} \quad \Sigma^{-1/2}(\vect{X}-\vect{\mu})\sim N_p(0,I_p). \]
+
   \section{Multivariate Chi-squared Distribution:}
   If $\vect{X} \sim N_p(0, I_p)$, then $\chi^2 = \vect{X}^T\vect{X} = \sum_{i=1}^p X_i^2 \sim \chi^2_p$. For non-central case, if $\vect{X} \sim N_p(\vect{\mu}, I_p)$, then $\vect{X}^T\vect{X} \sim \chi^2_p(\lambda)$ with non-centrality $\lambda=\vect{\mu}^T\vect{\mu}$.\\[0em]
   \textit{Properties:}
@@ -180,6 +187,7 @@
     Z\sim N(0,\sigma^2 I_n) & \implies Q/\sigma^2 \sim \chi^2_{r}
   \end{align*}
   \textbf{Independence:} If \( P_1 \) and \( P_2 \) are symmetric idempotent with \( P_1 P_2 = 0 \) (projections onto orthogonal subspaces), then \( Z^T P_1 Z \) and \( Z^T P_2 Z \) are independent.
+
   \section{Linear Model Setup:}
   Assume \( \vect{Y} = \vect{X}\beta + \varepsilon \) where \( \vect{Y} \) is \( n\times1 \), \( \vect{X} \) is \( n\times p \) (full rank \( p \)), \( \beta \) is \( p\times1 \) of unknown parameters, and \( \varepsilon \sim N(0,\sigma^2 I_n) \) (errors independent, homoscedastic, normal).
   \textit{Assumptions:} linear relationship, \( E[\varepsilon]=0 \), \( \mathrm{Var}(\varepsilon)=\sigma^2 I \), independent errors (normality for inference).
@@ -214,32 +222,34 @@
   If an \textit{intercept} (\( \beta_0 \)) is included,
   \begin{align}
     \mathrm{SST}               & = \sum \overbrace{ (\hat{\vect{Y}}_i - \bar{\vect{Y}})^2}^{\mathrm{SSR}} + \sum \overbrace{(\vect{Y}_i-\hat{\vect{Y}}_i)^2}^{\mathrm{SSE}} = \sum (\vect{Y}_i - \bar{\vect{Y}})^2 \\
-    \mathrm{R}^2               & = \dfrac{\mathrm{SSR}}{\mathrm{SST}} = 1 - \dfrac{\mathrm{SSE}}{\mathrm{SST}}, \quad \mathrm{R_{adj}^2} = 1 - \tfrac{n-1}{n-p-1}\left(1-\mathrm{R^2}\right)                       \\
+    \mathrm{SSE}               & = \sum (\vect{Y}_i - \hat{\vect{Y}}_i)^2 = (n - p)\hat{\sigma}^2, \quad \mathrm{SSR} = \sum (\hat{\vect{Y}}_i - \bar{\vect{Y}})^2 = (p-1)\hat{\sigma}^2                           \\
+    \mathrm{SST}               & = (n-1)\hat{\sigma}^2, \quad \mathrm{SST} = \mathrm{SSR} + \mathrm{SSE}, \quad \mathrm{SST} = \vect{Y}^T\vect{Y} - n\bar{\vect{Y}}^2                                              \\
+    \mathrm{R}^2               & = \dfrac{\mathrm{SSR}}{\mathrm{SST}} = 1 - \dfrac{\mathrm{SSE}}{\mathrm{SST}}, \quad \mathrm{R_{adj}^2} = 1 - \tfrac{n-1}{n-p}\left(1-\mathrm{R^2}\right)                         \\
     \mathrm{df}_{\mathrm{SSR}} & =p-1, \quad \mathrm{df}_{\mathrm{SSE}} = n - p, \quad \mathrm{df}_{\mathrm{SST}}=n-1 \tag{DoF}
   \end{align}
-  Under normal errors, \( \mathrm{SS_{err}}/\sigma^2 \sim \chi^2_{\,n-p}\) then \(\mathrm{SS_{err}}\) is independent of \( \hat{\beta} \).
-  An unbiased estimator of \( \sigma^2 \) is \( \hat{\sigma}^2 = \tfrac{1}{n-p}\mathrm{SS_{err}}.\)
-    \begin{tikzpicture}
-      \begin{axis}[width=4cm, height=3.5cm, xlabel={\( \vect{x} \)}, ylabel={\( \vect{y} \)},
-          xlabel style={font=\scriptsize}, ylabel style={font=\scriptsize},
-          tick label style={font=\scriptsize},
-          xmin=-0.3, xmax=3.3, ymin=0.5, ymax=5.5,
-          axis lines=left, xtick={0,1,2,3}, ytick={1,2,3,4,5}]
+  Under normal errors, \( \mathrm{SSE}/\sigma^2 \sim \chi^2_{\,n-p}\) then \(\mathrm{SSE}\) is independent of \( \hat{\beta} \).
+  An unbiased estimator of \( \sigma^2 \) is \( \hat{\sigma}^2 = \tfrac{1}{n-p}\mathrm{SSE}.\)
+  \begin{tikzpicture}
+    \begin{axis}[width=4cm, height=3.5cm, xlabel={\( \vect{x} \)}, ylabel={\( \vect{y} \)},
+        xlabel style={font=\scriptsize}, ylabel style={font=\scriptsize},
+        tick label style={font=\scriptsize},
+        xmin=-0.3, xmax=3.3, ymin=0.5, ymax=5.5,
+        axis lines=left, xtick={0,1,2,3}, ytick={1,2,3,4,5}]
 
-        % Regression line
-        \addplot[domain=0:3, color=blue] {1.2 + 1.2*x};
+      % Regression line
+      \addplot[domain=0:3, color=blue] {1.2 + 1.2*x};
 
-        % Data points
-        \addplot[only marks, mark=*,mark size=1.2] coordinates {(0,1) (1,3) (2,3) (3,5)};
+      % Data points
+      \addplot[only marks, mark=*,mark size=1.2] coordinates {(0,1) (1,3) (2,3) (3,5)};
 
-        % Residuals
-        \addplot[dashed, color=red] coordinates {(0,1) (0,1.2)};
-        \addplot[color=red] coordinates {(1,2.4) (1,3)};
-        \addplot[color=red] coordinates {(2,3) (2,3.6)};
-        \addplot[color=red] coordinates {(3,4.8) (3,5)};
+      % Residuals
+      \addplot[dashed, color=red] coordinates {(0,1) (0,1.2)};
+      \addplot[color=red] coordinates {(1,2.4) (1,3)};
+      \addplot[color=red] coordinates {(2,3) (2,3.6)};
+      \addplot[color=red] coordinates {(3,4.8) (3,5)};
 
-      \end{axis}
-    \end{tikzpicture}
+    \end{axis}
+  \end{tikzpicture}
   \section{Inference in Linear Model:}
   For each parameter \( \beta_j \), under \( H_0:\beta_j=0 \),
   \[ t = \frac{\hat{\beta}_j}{\mathrm{SE}(\hat{\beta}_j)} \sim t_{\,n-p}\,.\]
@@ -253,11 +263,13 @@
   \subsection{F-test:}
   For general linear hypothesis \( H_0: L\beta=0 \) where \( L \) is a \( d \times p \) matrix of rank \( d \):
   \[ F = \frac{(L\hat{\beta})^T [L(\vect{X}^T \vect{X})^{-1}L^T]^{-1}(L\hat{\beta})}{\hat{\sigma}^2} \sim F_{d,n-p} \]
+
   \begin{itemize}[left=0pt,labelsep=1pt,itemsep=0pt]
     \item Testing \( H_0: \beta_j=0 \): \( t^2 = F_{1,n-p} \)
     \item Global test \( H_0: \beta_1=\cdots=\beta_{p-1}=0 \): \( F = \frac{\text{SSR}/(p-1)}{\text{SSE}/(n-p)} \sim F_{p-1,n-p} \)
   \end{itemize}
-  Reject \( H_0 \) if \( F > F_{d,n-p,\alpha} \).
+  If \( F > F_{d,n-p,\alpha} \), reject \( H_0 \) at level \( \alpha \).
+
   \section{Model Selection:}
   Common criteria: \( \text{AIC} = n\ln(\mathrm{SSE}/n) + 2p, \) \quad
   \( \text{BIC} = n\ln(\mathrm{SSE}/n) + p\ln n \) \quad (smaller is better).
@@ -278,9 +290,8 @@
   When performing \( m \) hypothesis tests, the family-wise error rate (FWER) at level \( \alpha \) is \( \Pr(\text{any false rejection})\le \alpha. \)\\[0em]
   \textit{Bonferroni correction:} \( \alpha = \frac{\alpha}{m} \) for each test (controls FWER \( \le \alpha \)).\\[0em]
   \textit{S̆idák correction:} \( \alpha = 1 - (1-\alpha)^{1/m} \).\\[0em]
-  % Holm's step-down method: sort p-values \( p_{(1)}\le \cdots \le p_{(m)}. \) Let \( k \) be the smallest index such that \( p_{(k)} > \alpha/(m+1-k). \) Fail to reject all \( H_{(k)}, H_{(k+1)},\dots \); reject all hypotheses with p-value smaller than \( p_{(k)}. \) (This controls FWER, usually with higher power than Bonferroni.)
-  % False discovery rate (FDR) is the expected proportion of false positives among all rejections.
-  % Benjamini–Hochberg procedure: find largest \( k \) such that \( p_{(k)} \le \frac{k}{m}\,q \) (with desired FDR \( q \)). Reject \( H_{(1)},\dots,H_{(k)}. \) This controls FDR \( \approx q \) (allowing more discoveries at the cost of tolerating some false positives).
+  If \(p_i \le \alpha\) for \(i=1,\dots,m\), reject \(H_0\) for all \(i\) with \(p_i \le \alpha/m\) (Bonferroni) or \(p_i \le 1-(1-\alpha)^{1/m}\) (S̆idák).\\[0em]
+
   \section{Variance--Stabilising Transformations: Step-by-Step Guide}
   Given a random variable $Y$ with mean $\mu=\mathbb{E}[Y]$ and variance $\mathrm{Var}(Y)=v(\mu)$, a variance–stabilising transformation $g$ is obtained as follows:
   \begin{align}
@@ -289,7 +300,6 @@
     g'(\mu)                      & = \frac{\sqrt{C}}{\sqrt{v(\mu)}}                \\
     g(y)                         & = \sqrt{C}\,\int \frac{dy}{\sqrt{v(y)}}
   \end{align}
-  Typically choose $C=1$ and drop the additive constant $C_0$.
 
   \section{ANOVA (Analysis of Variance):}
   One-way ANOVA with \( a \) groups (levels) and total \( N \) observations: model \( Y_{ij} = \vect{\mu} + \tau_i + \varepsilon_{ij}, \) for \( i=1,\dots,a \) and \( j=1,\dots,n_i, \) where \( \tau_i \) is the effect of group \( i \) (with \( \sum_i \tau_i=0 \)) and \( \varepsilon_{ij}\sim N(0,\sigma^2). \)
@@ -312,4 +322,162 @@
   Design resolution \( R \): no effect involving \( <R \) factors is aliased with any other effect with \( <R \) factors. Higher resolution designs reduce confounding (e.g. resolution IV: no main effect aliased with any other main or 2-factor effect; resolution V: no main or 2-factor aliased with any other up to 2-factor effect, etc.).
   To de-alias key effects, one can run fold-over (the complementary fraction) or combine fractional designs to a higher resolution.
 \end{multicols}
+
+\begin{center}
+  \begin{tabular}{|l|l|l|}
+    \hline
+    \textbf{Metric}            & \textbf{Desired Value} & \textbf{Indicates}           \\
+    \hline
+    F-statistic                & Large, $p<0.05$        & Model is significant overall \\
+    $R^2$                      & High (e.g.\ $>0.7$)    & High variance explained      \\
+    Adj.\ $R^2$                & Close to $R^2$         & Efficient use of predictors  \\
+    RSE                        & Small                  & Low prediction error         \\
+    SE of $\hat\beta_j$        & Small                  & Precise estimates            \\
+    $p$-value of $\hat\beta_j$ & $<0.05$                & Significant predictor        \\
+    Residuals vs Fitted        & No pattern             & Linearity, homoscedasticity  \\
+    QQ-plot                    & Along 45° line         & Normal residuals             \\
+    Normality test             & $p>0.05$               & Assumption holds             \\
+    \hline
+  \end{tabular}
+\end{center}
+
+\begin{center}
+  \begin{tabular}{l l l}
+    \toprule
+    \textbf{Ops.}  & \textbf{Rule}                                                                     & \textbf{Cond.}                     \\\midrule
+    Indep. $\perp$ & $X\perp Y \Rightarrow \E[XY]=\E[X]\E[Y], \Cov(X,Y)=0$                             & converse only under normality      \\
+    Exp. lin.      & $\E[aX+bY+c]=a\E[X]+b\E[Y]+c$                                                     & always                             \\
+    Exp. scale     & $\E[aX+b]=a\E[X]+b$                                                               & constants $a,b$ only               \\
+    Exp. sum       & $\E[X+Y]=\E[X]+\E[Y]$                                                             & any $X,Y$                          \\
+    Exp. prod.     & $\E[XY]=\E[X]\E[Y]$ if $X \perp Y$                                                & independence only                  \\
+    Exp. prod. 2   & $\E[XY]=\Cov(X,Y)+\E[X]\E[Y]$ if $X \not\perp Y$                                  & rearranged definition              \\
+    Exp. const.    & $\E[c]=c$                                                                         & constant $c$                       \\
+    Exp. q. form   & $\E[X^2]=\Var(X)+\E[X]^2$                                                         & any $X$                            \\
+    Exp. q. form 2 & $\E[Q]=\E[X^T A X]=\E[X]^T A \E[X] + \mathrm{tr}(A \overbrace{\Var(X)}^{\Sigma})$ & $A$ symmetric, $X$ random vector   \\
+    Exp. of var.   & $\E[\Var(X)]=\Var(X)+\E[X]^2$                                                     & any $X$                            \\
+    Var. scale     & $\Var(aX+b)=a^{2}\Var(X)$                                                         & shift $b$ does not affect variance \\
+    Var. sum       & $\Var(X+Y)=\Var(X)+\Var(Y)+2\Cov(X,Y)$                                            & any $X,Y$                          \\
+    Cov. Lin       & $\Cov(X+Y,Z)=\Cov(X,Z)+\Cov(Y,Z)$                                                 & always                             \\
+    Cov. scale     & $\Cov(aX+b,\,cY+d)=ac\,\Cov(X,Y)$                                                 & constants $a,c$ only               \\
+    Symm.          & $\Cov(X,Y)=\Cov(Y,X)$                                                             & definition                         \\
+    Cov--Var link  & $\Cov(X,X)=\Var(X)$                                                               & special case                       \\
+    $0$-Cov        & $\Cov(X,Y)=0 \Rightarrow \Var(X\!\pm\!Y)=\Var(X)+\Var(Y)$                         & uncorrelated                       \\
+    Matrix form    & $\Cov(A X,\,B Y)=A\,\Cov(X,Y)\,B^{\mathsf T}$                                     & $A,B$ deterministic matrices       \\
+    Var. lin. map  & $\Var(A X)=A\,\Var(X)\,A^{\mathsf T}$                                             & take $B=A$ above                   \\
+    Exp. prod.     & $\E[XY]=\Cov(X,Y)+\E[X]\E[Y]$                                                     & rearranged definition              \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\begin{center}
+  \textbf{NOTATION TABLE}
+\end{center}
+\begin{center}
+  \scriptsize
+  \begin{tabular}{l l l}
+    \toprule
+    \textbf{Symbol}            & \textbf{Meaning}               & \textbf{Interpretation}                                 \\
+    \midrule
+    \multicolumn{3}{c}{\textbf{Basic Probability \& Statistics}}                                                          \\
+    $X, Y, Z$                  & Random variables               & Observable quantities with uncertainty                  \\
+    $\vect{X}, \vect{Y}$       & Random vectors                 & Multivariate random quantities                          \\
+    $x, y, z$                  & Realizations/observations      & Actual observed values                                  \\
+    $\E[X]$                    & Expectation of $X$             & Average/mean value of $X$                               \\
+    $\Var(X)$                  & Variance of $X$                & Spread/variability of $X$ around its mean               \\
+    $\Cov(X,Y)$                & Covariance                     & How $X$ and $Y$ vary together                           \\
+    $\Corr(X,Y)$               & Correlation                    & Standardized covariance, $\in [-1,1]$                   \\
+    $X \perp Y$                & Independence                   & $X$ and $Y$ don't influence each other                  \\
+    $X \sim N(\mu, \sigma^2)$  & Normal distribution            & $X$ follows normal with mean $\mu$, variance $\sigma^2$ \\
+    $\chi^2_k$                 & Chi-squared, $k$ df            & Sum of $k$ squared standard normals                     \\
+    $t_k$                      & Student's $t$, $k$ df          & Ratio of normal to chi-squared                          \\
+    $F_{d_1,d_2}$              & $F$-distribution               & Ratio of two chi-squared variables                      \\
+    \midrule
+    \multicolumn{3}{c}{\textbf{Matrix \& Vector Notation}}                                                                \\
+    $A, B, \Sigma$             & Matrices                       & Rectangular arrays of numbers                           \\
+    $A^T$                      & Transpose                      & Rows become columns                                     \\
+    $A^{-1}$                   & Inverse                        & $AA^{-1} = I$ (identity matrix)                         \\
+    $|A|, \det(A)$             & Determinant                    & Scaling factor, invertibility measure                   \\
+    $\text{tr}(A)$             & Trace                          & Sum of diagonal elements                                \\
+    $\text{rank}(A)$           & Rank                           & Number of linearly independent rows/columns             \\
+    $I_n$                      & Identity matrix                & $n \times n$ matrix with 1s on diagonal, 0s elsewhere   \\
+    $\vect{0}$                 & Zero vector                    & Vector of all zeros                                     \\
+    $H^2 = H$                  & Idempotent matrix              & Projection matrix property                              \\
+    \midrule
+    \multicolumn{3}{c}{\textbf{Linear Regression}}                                                                        \\
+    $\vect{Y}$                 & Response vector                & $n \times 1$ vector of outcomes                         \\
+    $\vect{X}$                 & Design matrix                  & $n \times p$ matrix of predictors                       \\
+    $\beta$                    & Parameter vector               & $p \times 1$ vector of regression coefficients          \\
+    $\varepsilon$              & Error vector                   & $n \times 1$ vector of random errors                    \\
+    $\hat{\beta}$              & Estimated parameters           & OLS estimate of $\beta$                                 \\
+    $\hat{\vect{Y}}$           & Fitted values                  & Predicted responses                                     \\
+    $e$                        & Residuals                      & Observed - fitted values                                \\
+    $H$                        & Hat matrix                     & Projects onto column space of $\vect{X}$                \\
+    $I - H$                    & Residual projection            & Projects onto orthogonal complement                     \\
+    $\hat{\sigma}^2$           & Error variance estimate        & Unbiased estimate of $\sigma^2$                         \\
+    \midrule
+    \multicolumn{3}{c}{\textbf{Sums of Squares}}                                                                          \\
+    $\text{SST}$               & Total sum of squares           & Total variation in $\vect{Y}$                           \\
+    $\text{SSR}$               & Regression sum of squares      & Variation explained by model                            \\
+    $\text{SSE}$               & Error sum of squares           & Unexplained variation                                   \\
+    $R^2$                      & Coefficient of determination   & Proportion of variance explained                        \\
+    $R_{\text{adj}}^2$         & Adjusted $R^2$                 & $R^2$ penalized for number of parameters                \\
+    \midrule
+    \multicolumn{3}{c}{\textbf{Hypothesis Testing}}                                                                       \\
+    $H_0$                      & Null hypothesis                & Statement being tested                                  \\
+    $H_1$                      & Alternative hypothesis         & What we believe if $H_0$ is false                       \\
+    $\alpha$                   & Significance level             & Probability of Type I error                             \\
+    $p$-value                  & Probability value              & Evidence against $H_0$                                  \\
+    $t$                        & $t$-statistic                  & Test statistic for single parameters                    \\
+    $F$                        & $F$-statistic                  & Test statistic for multiple parameters                  \\
+    $\text{df}$                & Degrees of freedom             & Parameters available for estimation                     \\
+    \midrule
+    \multicolumn{3}{c}{\textbf{Model Diagnostics}}                                                                        \\
+    $h_{ii}$                   & Leverage                       & Influence of observation $i$ on its own fit             \\
+    $r_i$                      & Standardized residual          & Residual scaled by its standard error                   \\
+    $D_i$                      & Cook's distance                & Overall influence of observation $i$                    \\
+    $\text{SE}(\hat{\beta}_j)$ & Standard error                 & Uncertainty in parameter estimate                       \\
+    \midrule
+    \multicolumn{3}{c}{\textbf{ANOVA}}                                                                                    \\
+    $\tau_i$                   & Treatment effect               & Effect of $i$-th group/treatment                        \\
+    $\text{SSB}$               & Between-group SS               & Variation between group means                           \\
+    $\text{SSW}$               & Within-group SS                & Variation within groups                                 \\
+    $a$                        & Number of groups               & Groups/treatments in the experiment                     \\
+    $N$                        & Total observations             & Total sample size across all groups                     \\
+    \midrule
+    \multicolumn{3}{c}{\textbf{Model Selection}}                                                                          \\
+    $\text{AIC}$               & Akaike Information Criterion   & Balances fit and complexity                             \\
+    $\text{BIC}$               & Bayesian Information Criterion & More conservative than AIC                              \\
+    $C_p$                      & Mallows' $C_p$                 & Measures prediction error                               \\
+    \midrule
+    \multicolumn{3}{c}{\textbf{Design of Experiments}}                                                                    \\
+    $2^k$                      & Full factorial                 & All combinations of $k$ factors at 2 levels             \\
+    $2^{k-p}$                  & Fractional factorial           & Subset of full factorial                                \\
+    $A^+, A^-$                 & Factor levels                  & High and low levels of factor $A$                       \\
+    $AB$                       & Interaction effect             & Combined effect of factors $A$ and $B$                  \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\begin{center}
+  \textbf{KEY FORMULAS \& WHAT THEY TELL US}
+\end{center}
+\begin{center}
+  \scriptsize
+  \begin{tabular}{l p{8cm}}
+    \toprule
+    \textbf{Formula}                                                            & \textbf{What It Tells Us}                                               \\
+    \midrule
+    $\hat{\beta} = (\vect{X}^T\vect{X})^{-1}\vect{X}^T\vect{Y}$                 & Best linear unbiased estimator minimizing squared errors                \\
+    $\text{Var}(\hat{\beta}) = \sigma^2(\vect{X}^T\vect{X})^{-1}$               & Uncertainty in parameter estimates depends on error variance and design \\
+    $t = \frac{\hat{\beta}_j}{\text{SE}(\hat{\beta}_j)}$                        & How many standard errors the estimate is from zero                      \\
+    $F = \frac{\text{MS}_{\text{model}}}{\text{MS}_{\text{error}}}$             & Ratio of explained to unexplained variation                             \\
+    $R^2 = \frac{\text{SSR}}{\text{SST}}$                                       & Fraction of total variation explained by the model                      \\
+    $(\vect{X} - \vect{\mu})^T\Sigma^{-1}(\vect{X} - \vect{\mu}) \sim \chi^2_p$ & Mahalanobis distance measures how far from center                       \\
+    $H = \vect{X}(\vect{X}^T\vect{X})^{-1}\vect{X}^T$                           & Projects data onto the space spanned by predictors                      \\
+    $\text{SST} = \text{SSR} + \text{SSE}$                                      & Total variation splits into explained and unexplained parts             \\
+    $\text{AIC} = n\ln(\text{SSE}/n) + 2p$                                      & Balance between goodness of fit and model complexity                    \\
+    $D_i = \frac{e_i^2}{p\hat{\sigma}^2} \cdot \frac{h_{ii}}{(1-h_{ii})^2}$     & Measures how much fitted values change when observation $i$ is removed  \\
+    \bottomrule
+  \end{tabular}
+\end{center}
 \end{document}
